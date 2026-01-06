@@ -1,0 +1,17 @@
+{
+  "name": "Streamify",
+  "short_name": "Streamify",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0c12",
+  "theme_color": "#6a5acd",
+  "description": "Streamify music streaming",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

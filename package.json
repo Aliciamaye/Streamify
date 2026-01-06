@@ -1,0 +1,40 @@
+{
+  "name": "streamify-frontend",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config src/vite.config.ts --port 5173 --host",
+    "build": "vite build --config src/vite.config.ts",
+    "preview": "vite preview --config src/vite.config.ts",
+    "lint": "eslint . --ext ts,tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+  },
+  "dependencies": {
+    "axios": "^1.6.5",
+    "electron-updater": "^6.6.2",
+    "framer-motion": "^10.16.16",
+    "lucide-react": "^0.300.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.20.0",
+    "wavesurfer.js": "^7.4.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^22.14.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^8.56.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.1.1",
+    "tailwindcss": "^3.4.14",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}

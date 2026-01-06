@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: streamify-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:5173
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_ENABLED=${REDIS_ENABLED:-false}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./backend/logs:/app/logs
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - streamify-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: streamify-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - streamify-network
+
+  # Redis Cache (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: streamify-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - streamify-network
+
+networks:
+  streamify-network:
+    driver: bridge
+
+volumes:
+  redis-data:
