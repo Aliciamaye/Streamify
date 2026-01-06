@@ -2,7 +2,7 @@
  * Lyrics Routes - Handle lyrics requests
  */
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import LyricsService from '../services/LyricsService';
 import { asyncHandler, ApiResponse } from '../utils/helpers';
 import { Logger } from '../utils/logger';
@@ -16,7 +16,7 @@ const logger = new Logger('LyricsRoutes');
  */
 router.get(
   '/:videoId',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { videoId } = req.params;
 
     const lyrics = await LyricsService.getLyricsByVideoId(videoId);
@@ -25,7 +25,7 @@ router.get(
       return res.status(404).json(ApiResponse.error('Lyrics not found', 404));
     }
 
-    res.json(ApiResponse.success(lyrics, 'Lyrics retrieved successfully'));
+    res.json(ApiResponse.success('Lyrics retrieved successfully', lyrics));
   })
 );
 
@@ -35,7 +35,7 @@ router.get(
  */
 router.get(
   '/:videoId/synced',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { videoId } = req.params;
     const { title, artist } = req.query;
 
@@ -49,7 +49,7 @@ router.get(
       return res.status(404).json(ApiResponse.error('Synced lyrics not found', 404));
     }
 
-    res.json(ApiResponse.success(syncedLyrics, 'Synced lyrics retrieved successfully'));
+    res.json(ApiResponse.success('Synced lyrics retrieved successfully', syncedLyrics));
   })
 );
 
@@ -59,7 +59,7 @@ router.get(
  */
 router.get(
   '/cache/stats',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const stats = LyricsService.getStats();
     res.json(ApiResponse.success(stats, 'Lyrics cache statistics'));
   })
@@ -71,14 +71,14 @@ router.get(
  */
 router.get(
   '/search',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     const { q } = req.query;
     if (!q || typeof q !== 'string') {
       return res.status(400).json(ApiResponse.error('Query is required', 400));
     }
 
     const results = await LyricsService.searchLyrics(q);
-    res.json(ApiResponse.success(results, 'Lyrics search results'));
+    res.json(ApiResponse.success('Lyrics search results', results));
   })
 );
 
@@ -88,9 +88,9 @@ router.get(
  */
 router.post(
   '/cache/clear',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req: Request, res: Response) => {
     await LyricsService.clearCache();
-    res.json(ApiResponse.success(null, 'Lyrics cache cleared'));
+    res.json(ApiResponse.success('Lyrics cache cleared', null));
   })
 );
 

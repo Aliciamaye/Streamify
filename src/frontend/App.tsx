@@ -3,9 +3,10 @@ import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'r
 import { PlayerProvider, usePlayer } from './contexts/PlayerContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { Home, Search, ListMusic, Settings, LogOut, Music2, SkipBack, Play, Pause, SkipForward, Volume2, VolumeX, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, Search, ListMusic, Settings, LogOut, Music2, SkipBack, Play, Pause, SkipForward, Volume2, VolumeX, Loader2, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 import { LoginView, SignupView } from './components/Auth/SimpleAuthViews';
 import { HomeView } from './components/Home';
+import Dashboard from './components/Dashboard';
 import { SearchView } from './components/Search';
 import { LibraryView } from './components/Library';
 import { SettingsView } from './components/Settings';
@@ -46,6 +47,10 @@ const Sidebar: React.FC = () => {
         <div onClick={() => navigate('/')} className={navClass('/')}>
           <Home size={22} />
           <span className="text-sm">Home</span>
+        </div>
+        <div onClick={() => navigate('/dashboard')} className={navClass('/dashboard')}>
+          <BarChart3 size={22} />
+          <span className="text-sm">Dashboard</span>
         </div>
         <div onClick={() => navigate('/search')} className={navClass('/search')}>
           <Search size={22} />
@@ -241,12 +246,14 @@ const AuthenticatedApp: React.FC = () => {
           <div className="flex-1 overflow-y-auto">
             <Routes>
               <Route path="/" element={<HomeView />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/search" element={<SearchView />} />
               <Route path="/library" element={<LibraryView />} />
               <Route path="/settings" element={<SettingsView />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/credits" element={<Credits />} />
+              <Route path="*" element={<Navigate to="/" />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>

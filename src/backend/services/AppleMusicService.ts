@@ -105,7 +105,7 @@ class AppleMusicService {
     let url: string | null = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`;
 
     while (url) {
-      const resp = await axios.get(url, {
+      const resp: any = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${devToken}`,
           'Music-User-Token': userToken,

@@ -47,10 +47,10 @@ export const SearchView: React.FC = () => {
       return { tracks: [], albums: [] };
     }
     const query = debouncedQuery.toLowerCase();
-    let tracks = TRACKS.filter(
+    let tracks = Object.values(TRACKS).filter(
       t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query)
     );
-    let albums = ALBUMS.filter(
+    let albums = Object.values(ALBUMS).filter(
       a => a.title.toLowerCase().includes(query) || a.artist.toLowerCase().includes(query)
     );
 
@@ -288,7 +288,7 @@ export const SearchView: React.FC = () => {
                         <Disc3 className="text-white/20" size={80} />
                       </div>
                       <button
-                        onClick={() => play(TRACKS.find(t => t.album === album.title) || TRACKS[0])}
+                        onClick={() => play(Object.values(TRACKS).find(t => t.album === album.title) || Object.values(TRACKS)[0])}
                         className="absolute bottom-3 right-3 p-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg"
                       >
                         <PlayCircle size={20} fill="currentColor" />

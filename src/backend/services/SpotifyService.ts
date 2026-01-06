@@ -131,7 +131,7 @@ class SpotifyService {
     const items: any[] = [];
     let url: string | null = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
     while (url) {
-      const resp = await axios.get(url, { headers: { Authorization: `Bearer ${accessToken}` }, timeout: 10000 });
+      const resp: any = await axios.get(url, { headers: { Authorization: `Bearer ${accessToken}` }, timeout: 10000 });
       items.push(...(resp.data.items || []));
       url = resp.data.next;
     }

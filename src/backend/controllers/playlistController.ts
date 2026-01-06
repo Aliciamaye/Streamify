@@ -32,7 +32,7 @@ export const createPlaylist = asyncHandler(async (req: Request, res: Response) =
     isCollaborative || false
   );
 
-  res.status(201).json(ApiResponse.success(playlist, 'Playlist created'));
+  res.status(201).json(ApiResponse.success('Playlist created', playlist));
 });
 
 /**
@@ -48,7 +48,7 @@ export const getPlaylist = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json(ApiResponse.error('Playlist not found', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Playlist retrieved'));
+  res.json(ApiResponse.success('Playlist retrieved', playlist));
 });
 
 /**
@@ -63,7 +63,7 @@ export const getUserPlaylists = asyncHandler(async (req: Request, res: Response)
 
   const playlists = await PlaylistService.getUserPlaylists(userId);
 
-  res.json(ApiResponse.success(playlists, 'Playlists retrieved'));
+  res.json(ApiResponse.success('Playlists retrieved', playlists));
 });
 
 /**
@@ -84,7 +84,7 @@ export const updatePlaylist = asyncHandler(async (req: Request, res: Response) =
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Playlist updated'));
+  res.json(ApiResponse.success('Playlist updated', playlist));
 });
 
 /**
@@ -104,7 +104,7 @@ export const deletePlaylist = asyncHandler(async (req: Request, res: Response) =
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(null, 'Playlist deleted'));
+  res.json(ApiResponse.success('Playlist deleted', null));
 });
 
 /**
@@ -135,7 +135,7 @@ export const addTrack = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Track added to playlist'));
+  res.json(ApiResponse.success('Track added to playlist', playlist));
 });
 
 /**
@@ -155,7 +155,7 @@ export const removeTrack = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Track removed from playlist'));
+  res.json(ApiResponse.success('Track removed from playlist', playlist));
 });
 
 /**
@@ -180,7 +180,7 @@ export const reorderTracks = asyncHandler(async (req: Request, res: Response) =>
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Tracks reordered'));
+  res.json(ApiResponse.success('Tracks reordered', playlist));
 });
 
 /**
@@ -205,7 +205,7 @@ export const addCollaborator = asyncHandler(async (req: Request, res: Response) 
     return res.status(404).json(ApiResponse.error('Playlist not found or not collaborative', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Collaborator added'));
+  res.json(ApiResponse.success('Collaborator added', playlist));
 });
 
 /**
@@ -225,7 +225,7 @@ export const removeCollaborator = asyncHandler(async (req: Request, res: Respons
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.json(ApiResponse.success(playlist, 'Collaborator removed'));
+  res.json(ApiResponse.success('Collaborator removed', playlist));
 });
 
 /**
@@ -241,7 +241,7 @@ export const toggleFollow = asyncHandler(async (req: Request, res: Response) => 
 
   const result = await PlaylistService.toggleFollow(playlistId, userId);
 
-  res.json(ApiResponse.success(result, result.followed ? 'Playlist followed' : 'Playlist unfollowed'));
+  res.json(ApiResponse.success(result.followed ? 'Playlist followed' : 'Playlist unfollowed', result));
 });
 
 /**
@@ -257,7 +257,7 @@ export const toggleLike = asyncHandler(async (req: Request, res: Response) => {
 
   const result = await PlaylistService.toggleLike(playlistId, userId);
 
-  res.json(ApiResponse.success(result, result.liked ? 'Playlist liked' : 'Playlist unliked'));
+  res.json(ApiResponse.success(result.liked ? 'Playlist liked' : 'Playlist unliked', result));
 });
 
 /**
@@ -278,7 +278,7 @@ export const duplicatePlaylist = asyncHandler(async (req: Request, res: Response
     return res.status(404).json(ApiResponse.error('Playlist not found or unauthorized', 404));
   }
 
-  res.status(201).json(ApiResponse.success(playlist, 'Playlist duplicated'));
+  res.status(201).json(ApiResponse.success('Playlist duplicated', playlist));
 });
 
 /**
@@ -290,7 +290,7 @@ export const getPublicPlaylists = asyncHandler(async (req: Request, res: Respons
 
   const playlists = await PlaylistService.getPublicPlaylists(limit, offset);
 
-  res.json(ApiResponse.success(playlists, 'Public playlists retrieved'));
+  res.json(ApiResponse.success('Public playlists retrieved', playlists));
 });
 
 /**
@@ -306,7 +306,7 @@ export const searchPlaylists = asyncHandler(async (req: Request, res: Response) 
 
   const playlists = await PlaylistService.searchPlaylists(q as string, userId);
 
-  res.json(ApiResponse.success(playlists, 'Playlists search results'));
+  res.json(ApiResponse.success('Playlists search results', playlists));
 });
 
 /**
@@ -332,5 +332,5 @@ export const incrementPlayCount = asyncHandler(async (req: Request, res: Respons
 
   await PlaylistService.incrementPlayCount(playlistId);
 
-  res.json(ApiResponse.success(null, 'Play count incremented'));
+  res.json(ApiResponse.success('Play count incremented', null));
 });

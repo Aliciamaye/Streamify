@@ -20,7 +20,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const { userId } = req.params;
     const profile = await SocialService.getUserProfile(userId);
-    res.json(ApiResponse.success(profile, 'Profile retrieved'));
+    res.json(ApiResponse.success('Profile retrieved', profile));
   })
 );
 
@@ -36,7 +36,7 @@ router.put(
     const updates = req.body;
     
     const profile = await SocialService.updateProfile(userId, updates);
-    res.json(ApiResponse.success(profile, 'Profile updated'));
+    res.json(ApiResponse.success('Profile updated', profile));
   })
 );
 
@@ -52,7 +52,7 @@ router.post(
     const { userId } = req.params;
     
     const result = await SocialService.followUser(followerId, userId);
-    res.json(ApiResponse.success(result, 'User followed'));
+    res.json(ApiResponse.success('User followed', result));
   })
 );
 
@@ -68,7 +68,7 @@ router.post(
     const { userId } = req.params;
     
     const result = await SocialService.unfollowUser(followerId, userId);
-    res.json(ApiResponse.success(result, 'User unfollowed'));
+    res.json(ApiResponse.success('User unfollowed', result));
   })
 );
 
@@ -85,7 +85,7 @@ router.get(
     const offset = parseInt(req.query.offset as string) || 0;
     
     const followers = await SocialService.getFollowers(userId, limit, offset);
-    res.json(ApiResponse.success(followers, 'Followers retrieved'));
+    res.json(ApiResponse.success('Followers retrieved', followers));
   })
 );
 
@@ -102,7 +102,7 @@ router.get(
     const offset = parseInt(req.query.offset as string) || 0;
     
     const following = await SocialService.getFollowing(userId, limit, offset);
-    res.json(ApiResponse.success(following, 'Following retrieved'));
+    res.json(ApiResponse.success('Following retrieved', following));
   })
 );
 
@@ -118,7 +118,7 @@ router.get(
     const { userId } = req.params;
     
     const isFollowing = await SocialService.isFollowing(followerId, userId);
-    res.json(ApiResponse.success({ isFollowing }, 'Follow status retrieved'));
+    res.json(ApiResponse.success('Follow status retrieved', { isFollowing }));
   })
 );
 
@@ -134,7 +134,7 @@ router.get(
     const limit = parseInt(req.query.limit as string) || 10;
     
     const suggestions = await SocialService.getSuggestedUsers(userId, limit);
-    res.json(ApiResponse.success(suggestions, 'Suggestions retrieved'));
+    res.json(ApiResponse.success('Suggestions retrieved', suggestions));
   })
 );
 
@@ -147,7 +147,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const popular = await SocialService.getPopularUsers(limit);
-    res.json(ApiResponse.success(popular, 'Popular users retrieved'));
+    res.json(ApiResponse.success('Popular users retrieved', popular));
   })
 );
 
@@ -164,7 +164,7 @@ router.get(
     const offset = parseInt(req.query.offset as string) || 0;
     
     const feed = await SocialService.getSocialFeed(userId, limit, offset);
-    res.json(ApiResponse.success(feed, 'Feed retrieved'));
+    res.json(ApiResponse.success('Feed retrieved', feed));
   })
 );
 
@@ -180,7 +180,7 @@ router.get(
     const offset = parseInt(req.query.offset as string) || 0;
     
     const activity = await SocialService.getUserActivity(userId, limit, offset);
-    res.json(ApiResponse.success(activity, 'Activity retrieved'));
+    res.json(ApiResponse.success('Activity retrieved', activity));
   })
 );
 
@@ -200,7 +200,7 @@ router.post(
     }
     
     const share = await SocialService.shareContent(userId, type, itemId, platform, message);
-    res.json(ApiResponse.success(share, 'Content shared'));
+    res.json(ApiResponse.success('Content shared', share));
   })
 );
 
@@ -215,7 +215,7 @@ router.get(
     const limit = parseInt(req.query.limit as string) || 50;
     
     const trending = await SocialService.getTrendingActivities(hours, limit);
-    res.json(ApiResponse.success(trending, 'Trending activities retrieved'));
+    res.json(ApiResponse.success('Trending activities retrieved', trending));
   })
 );
 
@@ -248,7 +248,7 @@ router.get(
     }
     
     const results = await SocialService.searchUsers(q as string, limit);
-    res.json(ApiResponse.success(results, 'Search results'));
+    res.json(ApiResponse.success('Search results', results));
   })
 );
 
@@ -264,7 +264,7 @@ router.get(
     const { userId } = req.params;
     
     const mutuals = await SocialService.getMutualFollowers(userId1, userId);
-    res.json(ApiResponse.success(mutuals, 'Mutual followers retrieved'));
+    res.json(ApiResponse.success('Mutual followers retrieved', mutuals));
   })
 );
 

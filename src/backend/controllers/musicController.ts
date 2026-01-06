@@ -24,13 +24,17 @@ export const searchMusic = asyncHandler(async (req: Request, res: Response) => {
 
   try {
     const results = await MusicService.searchSongs(q, Math.min(parseInt(limit as string) || 20, 100));
-    logger.info(`Search completed for: "${q}" - ${results.length} results`);
+    
+    // Ensure results is an array
+    const resultsArray = Array.isArray(results) ? results : [];
+    
+    logger.info(`Search completed for: "${q}" - ${resultsArray.length} results`);
 
     return res.status(200).json(
       new ApiResponse(true, 'Search successful', {
         query: q,
-        count: results.length,
-        results,
+        count: resultsArray.length,
+        results: resultsArray,
       })
     );
   } catch (error) {
@@ -98,8 +102,8 @@ export const getPlaybackUrl = asyncHandler(async (req: Request, res: Response) =
 
     return res.status(200).json(
       new ApiResponse(true, 'Playback URL', {
-        videoId,
         ...playbackUrl,
+        videoId,
       })
     );
   } catch (error) {

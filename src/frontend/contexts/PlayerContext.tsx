@@ -26,14 +26,21 @@ export interface PlayerContextType {
   queueIndex: number;
   isLoading: boolean;
   error: string | null;
+  repeatMode: 'off' | 'one' | 'all';
+  shuffleMode: boolean;
+  isMuted: boolean;
 
   // Playback controls
   play: (track: Track) => Promise<void>;
+  playTrack: (track: Track) => Promise<void>;
   pause: () => void;
   resume: () => void;
   stop: () => void;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
+  togglePlay: () => void;
+  togglePlayPause: () => void;
+  toggleMute: () => void;
 
   // Queue management
   addToQueue: (track: Track) => void;
@@ -41,8 +48,19 @@ export interface PlayerContextType {
   clearQueue: () => void;
   playNext: () => void;
   playPrevious: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  prevTrack: () => void;
   setRepeat: (mode: 'off' | 'one' | 'all') => void;
   setShuffle: (enabled: boolean) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+
+  // Playlist management
+  playlists: any[];
+  createPlaylist: (playlist: any) => void;
+  addToPlaylist: (track: Track, playlistId: string) => void;
+  deletePlaylist: (playlistId: string) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -59,6 +77,9 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [shuffleEnabled, setShuffleEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState(1);
+  const [playlists, setPlaylists] = useState<any[]>([]);
 
   // Media Session API integration (OS-level playback controls)
   useEffect(() => {
@@ -230,6 +251,73 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setShuffleEnabled(enabled);
   }, []);
 
+  // Additional missing methods
+  const togglePlay = useCallback(() => {
+    if (isPlaying) {
+      pause();
+    } else {
+      resume();
+    }
+  }, [isPlaying, pause, resume]);
+
+  const togglePlayPause = useCallback(() => {
+    togglePlay();
+  }, [togglePlay]);
+
+  const toggleMute = useCallback(() => {
+    if (isMuted) {
+      setVolume(previousVolume);
+      setIsMuted(false);
+    } else {
+      setPreviousVolume(volume);
+      setVolume(0);
+      setIsMuted(true);
+    }
+  }, [isMuted, volume, previousVolume]);
+
+  const nextTrack = useCallback(() => {
+    playNext();
+  }, [playNext]);
+
+  const previousTrack = useCallback(() => {
+    playPrevious();
+  }, [playPrevious]);
+
+  const prevTrack = useCallback(() => {
+    playPrevious();
+  }, [playPrevious]);
+
+  const toggleRepeat = useCallback(() => {
+    const modes: Array<'off' | 'one' | 'all'> = ['off', 'one', 'all'];
+    const currentIndex = modes.indexOf(repeatMode);
+    const nextMode = modes[(currentIndex + 1) % modes.length];
+    handleSetRepeat(nextMode);
+  }, [repeatMode, handleSetRepeat]);
+
+  const toggleShuffle = useCallback(() => {
+    handleSetShuffle(!shuffleEnabled);
+  }, [shuffleEnabled, handleSetShuffle]);
+
+  const playTrack = useCallback(async (track: Track) => {
+    await play(track);
+  }, [play]);
+
+  const createPlaylist = useCallback((playlist: any) => {
+    setPlaylists(prev => [...prev, playlist]);
+  }, []);
+
+  const addToPlaylist = useCallback((track: Track, playlistId: string) => {
+    setPlaylists(prev => prev.map(playlist => 
+      playlist.id === playlistId 
+        ? { ...playlist, tracks: [...playlist.tracks, track] }
+        : playlist
+    ));
+  }, []);
+
+  const deletePlaylist = useCallback((playlistId: string) => {
+    setPlaylists(prev => prev.filter(playlist => playlist.id !== playlistId));
+  }, []);
+
   const value: PlayerContextType = {
     currentTrack,
     isPlaying,
@@ -240,19 +328,35 @@ export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     queueIndex,
     isLoading,
     error,
+    repeatMode,
+    shuffleMode: shuffleEnabled,
+    isMuted,
     play,
+    playTrack,
     pause,
     resume,
     stop,
     seek,
     setVolume: handleSetVolume,
+    togglePlay,
+    togglePlayPause,
+    toggleMute,
     addToQueue,
     removeFromQueue,
     clearQueue,
     playNext,
     playPrevious,
+    nextTrack,
+    previousTrack,
+    prevTrack,
     setRepeat: handleSetRepeat,
     setShuffle: handleSetShuffle,
+    toggleRepeat,
+    toggleShuffle,
+    playlists,
+    createPlaylist,
+    addToPlaylist,
+    deletePlaylist,
   };
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

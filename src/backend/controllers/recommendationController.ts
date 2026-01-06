@@ -22,7 +22,7 @@ export const getPersonalizedRecommendations = asyncHandler(async (req: Request, 
 
   const recommendations = await RecommendationEngine.getPersonalizedRecommendations(userId, limit);
 
-  res.json(ApiResponse.success(recommendations, 'Personalized recommendations retrieved'));
+  res.json(ApiResponse.success('Personalized recommendations retrieved', recommendations));
 });
 
 /**
@@ -38,7 +38,7 @@ export const getRadioRecommendations = asyncHandler(async (req: Request, res: Re
 
   const recommendations = await RecommendationEngine.getRadioRecommendations(seedTrackId, limit);
 
-  res.json(ApiResponse.success(recommendations, 'Radio recommendations retrieved'));
+  res.json(ApiResponse.success('Radio recommendations retrieved', recommendations));
 });
 
 /**
@@ -64,7 +64,7 @@ export const trackListening = asyncHandler(async (req: Request, res: Response) =
     duration || 0
   );
 
-  res.json(ApiResponse.success(null, 'Listening tracked'));
+  res.json(ApiResponse.success('Listening tracked', null));
 });
 
 /**
@@ -84,7 +84,7 @@ export const addToFavorites = asyncHandler(async (req: Request, res: Response) =
 
   RecommendationEngine.addToFavorites(userId, trackId);
 
-  res.json(ApiResponse.success(null, 'Added to favorites'));
+  res.json(ApiResponse.success('Added to favorites', null));
 });
 
 /**
@@ -106,7 +106,7 @@ export const registerTrack = asyncHandler(async (req: Request, res: Response) =>
     tempo,
   });
 
-  res.json(ApiResponse.success(null, 'Track registered'));
+  res.json(ApiResponse.success('Track registered', null));
 });
 
 /**
@@ -125,5 +125,5 @@ export const getUserStats = asyncHandler(async (req: Request, res: Response) => 
     return res.status(404).json(ApiResponse.error('User stats not found', 404));
   }
 
-  res.json(ApiResponse.success(stats, 'User stats retrieved'));
+  res.json(ApiResponse.success('User stats retrieved', stats));
 });

@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 import AuthService, { UserPayload } from '../services/AuthService';
 import { ApiResponse, asyncHandler } from '../utils/helpers';
 import { Logger } from '../utils/logger';
-import { User } from '../models/User';
+import { User, UserRole, UserPermission } from '../models/User';
 import { v4 as uuidv4 } from 'uuid';
 
 const logger = new Logger('AuthController');
@@ -33,10 +33,21 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       passwordHash,
       firstName,
       lastName,
+      role: UserRole.USER,
+      permissions: [
+        UserPermission.CREATE_PLAYLIST,
+        UserPermission.EDIT_PLAYLIST,
+        UserPermission.DELETE_PLAYLIST,
+        UserPermission.SHARE_PLAYLIST,
+        UserPermission.COMMENT,
+        UserPermission.FOLLOW,
+        UserPermission.MESSAGE
+      ],
       createdAt: new Date(),
       updatedAt: new Date(),
       isEmailVerified: false,
       isActive: true,
+      isBanned: false,
       preferences: {
         theme: 'midnight',
         language: 'en',

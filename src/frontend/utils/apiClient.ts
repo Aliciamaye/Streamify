@@ -8,7 +8,7 @@ const API_BASE_URL =
   (import.meta as any).env?.VITE_API_URL ||
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (import.meta as any).env?.VITE_API_SERVER ||
-  'http://localhost:3001';
+  'http://localhost:5000';
 
 export interface ApiResponse<T = any> {
   success: boolean;
