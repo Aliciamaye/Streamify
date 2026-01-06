@@ -1,33 +1,77 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Disc3, Mic2, Music, PlayCircle, Search as SearchIcon, Sparkles } from 'lucide-react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { 
+  Disc3, Mic2, Music, PlayCircle, Search as SearchIcon, Sparkles, 
+  Filter, Clock, TrendingUp, X, History, Zap
+} from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 import { TRACKS, ALBUMS } from '../constants';
 import { apiClient } from '../utils/apiClient';
 import { useDebounce } from '../utils/hooks';
+import { SearchSkeleton, TrackSkeleton, LoadingSpinner } from './UI/LoadingComponents';
+
+interface SearchFilters {
+  duration: 'any' | 'short' | 'medium' | 'long';
+  quality: 'any' | 'high' | 'medium' | 'low';
+  explicit: boolean;
+}
 
 export const SearchView: React.FC = () => {
   const { play } = usePlayer();
   const [searchQuery, setSearchQuery] = useState('');
-  const debouncedQuery = useDebounce(searchQuery, 500);
+  const debouncedQuery = useDebounce(searchQuery, 300); // Faster response
   const [searchType, setSearchType] = useState<'all' | 'tracks' | 'albums' | 'lyrics'>('all');
   const [lyricsResults, setLyricsResults] = useState<any[]>([]);
   const [remoteTracks, setRemoteTracks] = useState<any[]>([]);
   const [isSearchingLyrics, setIsSearchingLyrics] = useState(false);
   const [isSearchingTracks, setIsSearchingTracks] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<SearchFilters>({
+    duration: 'any',
+    quality: 'any',
+    explicit: false
+  });
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
+    }
+  }, []);
 
   const localResults = useMemo(() => {
     if (!debouncedQuery.trim()) {
       return { tracks: [], albums: [] };
     }
     const query = debouncedQuery.toLowerCase();
-    const tracks = TRACKS.filter(
+    let tracks = TRACKS.filter(
       t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query)
-    ).slice(0, 30);
-    const albums = ALBUMS.filter(
+    );
+    let albums = ALBUMS.filter(
       a => a.title.toLowerCase().includes(query) || a.artist.toLowerCase().includes(query)
-    ).slice(0, 20);
-    return { tracks, albums };
-  }, [debouncedQuery]);
+    );
+
+    // Apply filters
+    if (filters.duration !== 'any') {
+      tracks = tracks.filter(t => {
+        const duration = t.duration || 0;
+        switch (filters.duration) {
+          case 'short': return duration < 180; // < 3 minutes
+          case 'medium': return duration >= 180 && duration < 300; // 3-5 minutes
+          case 'long': return duration >= 300; // > 5 minutes
+          default: return true;
+        }
+      });
+    }
+
+    return { 
+      tracks: tracks.slice(0, 30), 
+      albums: albums.slice(0, 20) 
+    };
+  }, [debouncedQuery, filters]);
 
   const hasLocalResults = localResults.tracks.length > 0 || localResults.albums.length > 0;
 
