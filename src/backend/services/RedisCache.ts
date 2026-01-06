@@ -101,7 +101,7 @@ export class RedisCache {
 
     // Fallback to memory cache
     const entry = this.memoryCache.get(key);
-    
+
     if (!entry) {
       return null;
     }
@@ -144,7 +144,7 @@ export class RedisCache {
 
     const entry = this.memoryCache.get(key);
     if (!entry) return false;
-    
+
     if (Date.now() > entry.expiresAt) {
       this.memoryCache.delete(key);
       return false;
@@ -199,5 +199,74 @@ export class RedisCache {
       type: this.redisAvailable ? 'redis' : 'memory',
       size: this.memoryCache.size,
     };
+  }
+
+  /**
+   * Get TTL of a key in seconds
+   */
+  async ttl(key: string): Promise<number> {
+    if (this.redisAvailable && this.redisClient) {
+      try {
+        return await this.redisClient.ttl(key);
+      } catch (error) {
+        logger.warn('Redis TTL failed:', error);
+      }
+    }
+
+    const entry = this.memoryCache.get(key);
+    if (entry) {
+      const remaining = Math.floor((entry.expiresAt - Date.now()) / 1000);
+      return remaining > 0 ? remaining : -2;
+    }
+    return -2;
+  }
+
+  /**
+   * Increment a key's value
+   */
+  async incr(key: string): Promise<number> {
+    if (this.redisAvailable && this.redisClient) {
+      try {
+        return await this.redisClient.incr(key);
+      } catch (error) {
+        logger.warn('Redis INCR failed:', error);
+      }
+    }
+
+    const entry = this.memoryCache.get(key);
+    const current = entry?.value ? parseInt(entry.value as string) || 0 : 0;
+    const newValue = current + 1;
+    const expiresAt = entry?.expiresAt || Date.now() + 3600000;
+    this.memoryCache.set(key, { value: newValue.toString(), expiresAt });
+    return newValue;
+  }
+
+  /**
+   * Set expiration on a key
+   */
+  async expire(key: string, seconds: number): Promise<boolean> {
+    if (this.redisAvailable && this.redisClient) {
+      try {
+        await this.redisClient.expire(key, seconds);
+        return true;
+      } catch (error) {
+        logger.warn('Redis EXPIRE failed:', error);
+      }
+    }
+
+    const entry = this.memoryCache.get(key);
+    if (entry) {
+      entry.expiresAt = Date.now() + (seconds * 1000);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Delete a key (alias for delete method)
+   */
+  async del(key: string): Promise<boolean> {
+    await this.delete(key);
+    return true;
   }
 }

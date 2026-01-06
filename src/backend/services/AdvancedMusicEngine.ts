@@ -50,7 +50,7 @@ export class AdvancedMusicEngine {
   constructor() {
     this.redis = new RedisCache();
     this.cipher = new SignatureCipher();
-    
+
     this.extractors = [
       { name: 'ytdl_core', priority: 1, enabled: true, lastUsed: 0, successRate: 0.95 },
       { name: 'youtube_dl', priority: 2, enabled: true, lastUsed: 0, successRate: 0.90 },
@@ -77,11 +77,11 @@ export class AdvancedMusicEngine {
    */
   async extractTrack(videoId: string, quality: 'high' | 'medium' | 'low' = 'high'): Promise<MusicTrack | null> {
     const cacheKey = `track:${videoId}:${quality}`;
-    
+
     // Check cache first
-    const cached = await this.redis.get(cacheKey);
+    const cached = await this.redis.get<string>(cacheKey);
     if (cached) {
-      return JSON.parse(cached);
+      return JSON.parse(cached as string);
     }
 
     // Sort extractors by priority and success rate
@@ -99,15 +99,15 @@ export class AdvancedMusicEngine {
 
           // Cache successful result
           await this.redis.set(cacheKey, JSON.stringify(track), 3600); // 1 hour
-          
+
           return track;
         }
-      } catch (error) {
-        console.error(`Extractor ${extractor.name} failed:`, error.message);
-        
+      } catch (error: any) {
+        console.error(`Extractor ${extractor.name} failed:`, error?.message);
+
         // Decrease success rate
         extractor.successRate = Math.max(0, extractor.successRate - 0.05);
-        
+
         // Disable temporarily if too many failures
         if (extractor.successRate < 0.3) {
           extractor.enabled = false;
@@ -123,7 +123,7 @@ export class AdvancedMusicEngine {
    * Search with advanced filtering and deduplication
    */
   async searchTracks(
-    query: string, 
+    query: string,
     filters: {
       duration?: { min?: number; max?: number };
       quality?: 'high' | 'medium' | 'low';
@@ -133,17 +133,17 @@ export class AdvancedMusicEngine {
     limit = 20
   ): Promise<MusicTrack[]> {
     const cacheKey = `search:${crypto.createHash('md5').update(JSON.stringify({ query, filters, limit })).digest('hex')}`;
-    
-    const cached = await this.redis.get(cacheKey);
+
+    const cached = await this.redis.get<string>(cacheKey);
     if (cached) {
-      return JSON.parse(cached);
+      return JSON.parse(cached as string);
     }
 
     const results = await this.performSearch(query, filters, limit);
-    
+
     // Cache results for 30 minutes
     await this.redis.set(cacheKey, JSON.stringify(results), 1800);
-    
+
     return results;
   }
 
@@ -160,7 +160,7 @@ export class AdvancedMusicEngine {
 
       // If URL has signature, decode it
       if (stream.url.includes('&s=') || stream.url.includes('&signature=')) {
-        return await this.cipher.decodeUrl(stream.url);
+        return await this.cipher.decipher(stream.url, videoId);
       }
 
       return stream.url;
@@ -175,10 +175,10 @@ export class AdvancedMusicEngine {
    */
   async extractPlaylist(playlistId: string): Promise<MusicTrack[]> {
     const cacheKey = `playlist:${playlistId}`;
-    
-    const cached = await this.redis.get(cacheKey);
+
+    const cached = await this.redis.get<string>(cacheKey);
     if (cached) {
-      return JSON.parse(cached);
+      return JSON.parse(cached as string);
     }
 
     try {
@@ -207,7 +207,7 @@ export class AdvancedMusicEngine {
 
       // Cache playlist for 2 hours
       await this.redis.set(cacheKey, JSON.stringify(tracks), 7200);
-      
+
       return tracks;
     } catch (error) {
       console.error('Playlist extraction failed:', error);
@@ -227,11 +227,11 @@ export class AdvancedMusicEngine {
 
     for (const extractor of this.extractors) {
       const start = Date.now();
-      
+
       try {
         const result = await this.tryExtractor(extractor.name, testVideoId, 'medium');
         const latency = Date.now() - start;
-        
+
         results.push({
           name: extractor.name,
           status: result ? (latency < 5000 ? 'healthy' : 'degraded') : 'failed',
@@ -299,7 +299,7 @@ export class AdvancedMusicEngine {
     try {
       const ytdl = require('ytdl-core');
       const info = await ytdl.getInfo(videoId);
-      
+
       return {
         id: videoId,
         title: info.videoDetails.title,
@@ -318,8 +318,8 @@ export class AdvancedMusicEngine {
           explicit: false // Would need additional detection
         }
       };
-    } catch (error) {
-      throw new Error(`ytdl-core extraction failed: ${error.message}`);
+    } catch (error: any) {
+      throw new Error(`ytdl-core extraction failed: ${error?.message}`);
     }
   }
 
